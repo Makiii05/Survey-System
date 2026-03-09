@@ -1,0 +1,40 @@
+- [x] create middleware for easy block of pages
+- [x] use model to fetch things 
+- [x] create helper function in the model if needed
+- [x] add code->unique on surveys schema, a 7 combination of letter and number. this is used in private search and copy link
+- [x] use toaster notif
+- [x] color pallette  #004179 #f3c404
+
+- [x] login page 
+    - email password, wit app name, back home button 
+- [x] register page
+    - email, username, passwrod, app name, back home button
+- [x] layout component
+    - a headbar
+    - if not auth then has <a> browse survey, login, register
+    - if auth then has <a> browse survey, my survey, create survey, logout
+    - has a footer
+- [x] landing page
+    - home
+    - use layout
+    - section 1: app name and motto, 2 button get started and view survey.
+    - section 2: facts about the system, easy to create, diff type of survey, easy to share
+    - section 3: recent surveys
+    - section 4: popular surveys
+- [x] browse survey page
+    - has a serach for private input
+    - a card with title and descrioption
+        - who created and date creation
+        - has badge if require logins, allow multiple
+        - is_public only
+        - is_active only
+        - take survey button
+            - if public straight to survey page
+            - if private, and not login, take to login page
+- [x] my survey page
+    - should be auth
+    - have create survey button
+    - a card similar to browse survey page
+    - a card diff is that instead of take survey button, it has 4, results, copy link, delete, and activate or deactivate.
+
+- [ ] create survay page and survay page is coming soon, just add a file for it with text "this is ---"

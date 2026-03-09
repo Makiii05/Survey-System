@@ -11,7 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'auth.survey' => \App\Http\Middleware\EnsureAuthenticated::class,
+        ]);
+        $middleware->redirectGuestsTo('/login');
+        $middleware->redirectUsersTo('/my-surveys');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
