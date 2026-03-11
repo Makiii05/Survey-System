@@ -46,11 +46,17 @@
             <div class="mb-6">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-lg font-semibold" style="color: #004179;">Questions</h2>
-                    <button type="button" onclick="openModal()"
-                        class="px-4 py-2 rounded-lg text-sm font-semibold transition hover:opacity-90 cursor-pointer"
-                        style="background-color: #f3c404; color: #004179;">
-                        + Add Question
-                    </button>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="addDemographicInfo()"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold transition hover:opacity-90 cursor-pointer bg-gray-300 hover:bg-gray-400">
+                            Require Demographic
+                        </button>
+                        <button type="button" onclick="openModal()"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold transition hover:opacity-90 cursor-pointer"
+                            style="background-color: #f3c404; color: #004179;">
+                            Add Question
+                        </button>
+                    </div>
                 </div>
                 <div id="questionsList" class="space-y-3">
                 </div>
@@ -184,11 +190,24 @@
             }
         }
 
+        function addDemographicInfo() {
+            const demographicQuestions = [
+                { text: 'Age', type: 'number', required: true, options: [] },
+                { text: 'Gender', type: 'radio', required: true, options: ['Male', 'Female', 'Other'] },
+                { text: 'Location', type: 'text', required: true, options: [] }
+            ];
+
+            demographicQuestions.forEach(q => questions.push(q));
+            renderQuestions();
+        }
+
         function saveQuestion() {
             const text = document.getElementById('modalQuestionText').value.trim();
             const type = document.getElementById('modalQuestionType').value;
             const required = document.getElementById('modalRequired').checked;
             const optionsRaw = document.getElementById('modalOptions').value.trim();
+
+            console.log(text, type, required, optionsRaw);
 
             if (!text) {
                 alert('Please enter a question.');

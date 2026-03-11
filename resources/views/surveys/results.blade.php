@@ -88,10 +88,28 @@
                             @endfor
                         </div>
                     @else
+                        @php
+                            $totalAnswers = $question->answers->count();
+                            $textCounts = [];
+                            foreach ($question->answers as $answer) {
+                                $text = $answer->answer_text ?: '—';
+                                $key = strtolower(trim($text));
+                                if (!isset($textCounts[$key])) {
+                                    $textCounts[$key] = ['text' => $text, 'count' => 0];
+                                }
+                                $textCounts[$key]['count']++;
+                            }
+                            // Sort by count descending
+                            uasort($textCounts, fn($a, $b) => $b['count'] - $a['count']);
+                        @endphp
                         <div class="space-y-2 max-h-60 overflow-y-auto">
-                            @foreach($question->answers as $answer)
-                                <div class="bg-gray-50 rounded-lg px-4 py-2 text-sm text-gray-700">
-                                    {{ $answer->answer_text ?: '—' }}
+                            @foreach($textCounts as $item)
+                                <div class="bg-gray-50 rounded-lg px-4 py-2 text-sm text-gray-700 flex items-center justify-between">
+                                    <span>{{ $item['text'] }}</span>
+                                    @php
+                                        $pct = $totalAnswers > 0 ? round(($item['count'] / $totalAnswers) * 100) : 0;
+                                    @endphp
+                                    <span class="text-gray-400 text-xs ml-2">{{ $item['count'] }} ({{ $pct }}%)</span>
                                 </div>
                             @endforeach
                         </div>

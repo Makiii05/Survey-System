@@ -1,9 +1,9 @@
-<x-layout title="SurveyEase - Create & Share Surveys">
+<x-layout title="Pollaro - Create & Share Surveys">
     <section class="relative overflow-hidden" style="background-color: #004179;">
         <div class="px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
             <div class="text-center">
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                    Survey<span style="color: #f3c404;">Ease</span>
+                    Poll<span style="color: #f3c404;">aro</span>
                 </h1>
                 <p class="mt-4 text-lg sm:text-xl text-white/80">
                     Create, share, and analyze surveys with ease. The simplest way to gather feedback and insights.
@@ -38,7 +38,7 @@
     <section class="py-20 bg-gray-50">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-14">
-                <h2 class="text-3xl font-bold" style="color: #004179;">Why SurveyEase?</h2>
+                <h2 class="text-3xl font-bold" style="color: #004179;">Why Pollaro?</h2>
                 <p class="text-gray-500 mt-2">Everything you need to create professional surveys</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">

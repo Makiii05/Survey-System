@@ -22,6 +22,19 @@ class SurveyController extends Controller
         return view('home', compact('recentSurveys', 'popularSurveys'));
     }
 
+    public function dashboard()
+    {
+        $user = Auth::user();
+        
+        $surveysCreated = $user->surveys()->count();
+        $totalResponses = SurveyResponse::whereIn('survey_id', $user->surveys()->pluck('id'))->count();
+        $surveysAnswered = $user->surveyResponses()->count();
+        
+        $recentSurveys = $user->surveys()->withCount('responses')->latest()->take(5)->get();
+        
+        return view('surveys.dashboard', compact('surveysCreated', 'totalResponses', 'surveysAnswered', 'recentSurveys'));
+    }
+
     public function browse(Request $request)
     {
         $surveys = Survey::active()->public()->with('user')->latest()->paginate(12);

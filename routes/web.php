@@ -18,6 +18,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [UserController::class, 'register']);
 });
 Route::middleware('auth.survey')->group(function () {
+    Route::get('/dashboard', [SurveyController::class, 'dashboard'])->name('dashboard');
     Route::get('/my-surveys', [SurveyController::class, 'mySurveys'])->name('surveys.my');
     Route::get('/surveys/create', [SurveyController::class, 'create'])->name('surveys.create');
     Route::post('/surveys', [SurveyController::class, 'store'])->name('surveys.store');

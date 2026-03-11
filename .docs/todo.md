@@ -37,4 +37,10 @@
     - a card similar to browse survey page
     - a card diff is that instead of take survey button, it has 4, results, copy link, delete, and activate or deactivate.
 
-- [ ] create survay page and survay page is coming soon, just add a file for it with text "this is ---"
+- [x] create survay page and survay page is coming soon, just add a file for it with text "this is ---"
+
+- [x] demographics
+
+- [x] statistics
+
+- [ ] charts in each quuestion

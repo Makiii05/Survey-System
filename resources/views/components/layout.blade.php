@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'SurveyEase' }}</title>
+    <title>{{ $title ?? 'Pollaro' }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -14,7 +14,7 @@
         <div class="mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <a href="{{ route('home') }}" class="text-xl font-bold text-white tracking-tight">
-                    Survey<span style="color: #f3c404;">Ease</span>
+                    Poll<span style="color: #f3c404;">aro</span>
                 </a>
                 <nav class="flex items-center gap-1 sm:gap-3">
                     <a href="{{ route('surveys.browse') }}" class="px-3 py-2 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition">
@@ -22,6 +22,9 @@
                     </a>
 
                     @auth
+                        <a href="{{ route('dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition">
+                            Dashboard
+                        </a>
                         <a href="{{ route('surveys.my') }}" class="px-3 py-2 rounded-md text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition">
                             My Surveys
                         </a>
@@ -54,7 +57,7 @@
         <div class="mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="text-sm">
-                    &copy; {{ date('Y') }} <span class="text-white font-semibold">Survey<span style="color: #f3c404;">Ease</span></span>. All rights reserved.
+                    &copy; {{ date('Y') }} <span class="text-white font-semibold">Poll<span style="color: #f3c404;">aro</span></span>. All rights reserved.
                 </div>
                 <div class="flex gap-6 text-sm">
                     <a href="{{ route('home') }}" class="hover:text-white transition">Home</a>
