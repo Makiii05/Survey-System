@@ -44,3 +44,7 @@
 - [x] statistics
 
 - [ ] charts in each quuestion
+
+- [ ] charts can be change. Pie, Bar, Etc 
+
+- [ ] sectioning of questions

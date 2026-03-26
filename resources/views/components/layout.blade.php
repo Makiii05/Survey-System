@@ -53,18 +53,5 @@
     <main class="flex-1">
         {{ $slot }}
     </main>
-    <footer style="background-color: #004179;" class="text-white/70">
-        <div class="mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="text-sm">
-                    &copy; {{ date('Y') }} <span class="text-white font-semibold">Poll<span style="color: #f3c404;">aro</span></span>. All rights reserved.
-                </div>
-                <div class="flex gap-6 text-sm">
-                    <a href="{{ route('home') }}" class="hover:text-white transition">Home</a>
-                    <a href="{{ route('surveys.browse') }}" class="hover:text-white transition">Browse</a>
-                </div>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>

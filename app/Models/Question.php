@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Question extends Model
 {
     protected $fillable = [
-        'survey_id',
+        'section_id',
         'question_text',
         'question_type',
         'is_required',
         'sort_order',
     ];
 
-    public function survey()
+    public function section()
     {
-        return $this->belongsTo(Survey::class);
+        return $this->belongsTo(Section::class);
     }
 
     public function options()

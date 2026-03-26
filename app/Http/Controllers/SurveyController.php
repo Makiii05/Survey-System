@@ -3,10 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Survey;
-use App\Models\Answer;
-use App\Models\AnswerOption;
-use App\Models\Question;
-use App\Models\QuestionOption;
 use App\Models\SurveyResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -97,16 +93,24 @@ class SurveyController extends Controller
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'questions_json' => ['required', 'string'],
+            'sections_json' => ['required', 'string'],
         ]);
 
-        $questionsData = json_decode($request->questions_json, true);
+        $sectionsData = json_decode($request->sections_json, true);
 
-        if (!is_array($questionsData) || count($questionsData) === 0) {
+        if (!is_array($sectionsData) || count($sectionsData) === 0) {
+            return back()->with('error', 'Please add at least one section with questions.')->withInput();
+        }
+
+        $hasAtLeastOneQuestion = collect($sectionsData)->contains(function ($sectionData) {
+            return !empty($sectionData['questions']) && is_array($sectionData['questions']);
+        });
+
+        if (!$hasAtLeastOneQuestion) {
             return back()->with('error', 'Please add at least one question.')->withInput();
         }
 
-        DB::transaction(function () use ($request, $questionsData) {
+        DB::transaction(function () use ($request, $sectionsData) {
             $survey = Survey::create([
                 'user_id' => Auth::id(),
                 'title' => $request->title,
@@ -116,20 +120,34 @@ class SurveyController extends Controller
                 'requires_login' => $request->has('requires_login'),
             ]);
 
-            foreach ($questionsData as $index => $qData) {
-                $question = $survey->questions()->create([
-                    'question_text' => $qData['text'],
-                    'question_type' => $qData['type'],
-                    'is_required' => $qData['required'] ?? false,
-                    'sort_order' => $index,
+            foreach ($sectionsData as $sectionIndex => $sectionData) {
+                $questions = $sectionData['questions'] ?? [];
+
+                if (!is_array($questions) || count($questions) === 0) {
+                    continue;
+                }
+
+                $section = $survey->sections()->create([
+                    'title' => $sectionData['title'] ?? 'Untitled Section',
+                    'description' => $sectionData['description'] ?? null,
+                    'sort_order' => $sectionIndex,
                 ]);
 
-                if (!empty($qData['options'])) {
-                    foreach ($qData['options'] as $optIndex => $optText) {
-                        $question->options()->create([
-                            'option_text' => $optText,
-                            'sort_order' => $optIndex,
-                        ]);
+                foreach ($questions as $questionIndex => $qData) {
+                    $question = $section->questions()->create([
+                        'question_text' => $qData['text'],
+                        'question_type' => $qData['type'],
+                        'is_required' => $qData['required'] ?? false,
+                        'sort_order' => $questionIndex,
+                    ]);
+
+                    if (!empty($qData['options'])) {
+                        foreach ($qData['options'] as $optIndex => $optText) {
+                            $question->options()->create([
+                                'option_text' => $optText,
+                                'sort_order' => $optIndex,
+                            ]);
+                        }
                     }
                 }
             }
@@ -142,7 +160,20 @@ class SurveyController extends Controller
     {
         $survey = Survey::where('code', $code)
             ->where('is_active', true)
-            ->with(['user', 'questions.options'])
+            ->with([
+                'user',
+                'sections' => function ($query) {
+                    $query->orderBy('sort_order')->with([
+                        'questions' => function ($questionQuery) {
+                            $questionQuery->orderBy('sort_order')->with([
+                                'options' => function ($optionQuery) {
+                                    $optionQuery->orderBy('sort_order');
+                                },
+                            ]);
+                        },
+                    ]);
+                },
+            ])
             ->firstOrFail();
 
         if (Auth::check() && $survey->user_id === Auth::id()) {
@@ -159,7 +190,21 @@ class SurveyController extends Controller
     public function results($code)
     {
         $survey = Survey::where('code', $code)
-            ->with(['user', 'questions.options', 'questions.answers.answerOptions'])
+            ->with([
+                'user',
+                'sections' => function ($query) {
+                    $query->orderBy('sort_order')->with([
+                        'questions' => function ($questionQuery) {
+                            $questionQuery->orderBy('sort_order')->with([
+                                'options' => function ($optionQuery) {
+                                    $optionQuery->orderBy('sort_order');
+                                },
+                                'answers.answerOptions',
+                            ]);
+                        },
+                    ]);
+                },
+            ])
             ->withCount('responses')
             ->firstOrFail();
 
@@ -174,8 +219,20 @@ class SurveyController extends Controller
     {
         $survey = Survey::where('code', $code)
             ->where('is_active', true)
-            ->with('questions.options')
+            ->with([
+                'sections' => function ($query) {
+                    $query->orderBy('sort_order')->with([
+                        'questions' => function ($questionQuery) {
+                            $questionQuery->orderBy('sort_order')->with('options');
+                        },
+                    ]);
+                },
+            ])
             ->firstOrFail();
+
+        $questions = $survey->sections->flatMap(function ($section) {
+            return $section->questions;
+        });
 
         if ($survey->requires_login && !Auth::check()) {
             return redirect()->route('login')->with('error', 'You must be logged in to submit this survey.');
@@ -184,7 +241,7 @@ class SurveyController extends Controller
         $rules = [
             'respondent_email' => ['required', 'email', 'max:255'],
         ];
-        foreach ($survey->questions as $question) {
+        foreach ($questions as $question) {
             if ($question->is_required) {
                 $rules["answers.{$question->id}"] = ['required'];
             }
@@ -200,14 +257,14 @@ class SurveyController extends Controller
             }
         }
 
-        DB::transaction(function () use ($request, $survey) {
+        DB::transaction(function () use ($request, $survey, $questions) {
             $response = SurveyResponse::create([
                 'survey_id' => $survey->id,
                 'user_id' => Auth::id(),
                 'respondent_email' => $request->respondent_email,
             ]);
 
-            foreach ($survey->questions as $question) {
+            foreach ($questions as $question) {
                 $value = $request->input("answers.{$question->id}");
                 if ($value === null) continue;
 
