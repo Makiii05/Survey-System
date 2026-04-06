@@ -25,106 +25,107 @@
                     @if($section->description)
                         <p class="text-sm text-gray-500 mt-1">{{ $section->description }}</p>
                     @endif
-                </div>
-
-                @foreach($section->questions as $question)
-                    @php $questionNumber++; @endphp
-                    <div class="bg-white border border-gray-200 rounded-lg p-5 mb-4">
-                        <h3 class="font-medium text-gray-800 mb-4">
-                            {{ $questionNumber }}. {{ $question->question_text }}
-                            <span class="text-xs text-gray-400 ml-2">({{ ucfirst($question->question_type) }})</span>
-                        </h3>
-
-                        @php
-                            $typesWithOptions = ['radio', 'checkbox', 'dropdown'];
-                        @endphp
-
-                        @if(in_array($question->question_type, $typesWithOptions))
+                    <hr class="my-3 text-slate-400">
+                    @foreach($section->questions as $question)
+                        @php $questionNumber++; @endphp
+                        <div class="bg-white border border-gray-200 rounded-lg p-5 mb-4">
+                            <h3 class="font-medium text-gray-800 mb-4">
+                                {{ $questionNumber }}. {{ $question->question_text }}
+                                <span class="text-xs text-gray-400 ml-2">({{ ucfirst($question->question_type) }})</span>
+                            </h3>
+    
                             @php
-                                $totalAnswers = $question->answers->count();
-                                $optionCounts = [];
-                                foreach ($question->options as $option) {
-                                    $optionCounts[$option->id] = [
-                                        'text' => $option->option_text,
-                                        'count' => 0,
-                                    ];
-                                }
-                                foreach ($question->answers as $answer) {
-                                    foreach ($answer->answerOptions as $ao) {
-                                        if (isset($optionCounts[$ao->option_id])) {
-                                            $optionCounts[$ao->option_id]['count']++;
+                                $typesWithOptions = ['radio', 'checkbox', 'dropdown'];
+                            @endphp
+    
+                            @if(in_array($question->question_type, $typesWithOptions))
+                                @php
+                                    $totalAnswers = $question->answers->count();
+                                    $optionCounts = [];
+                                    foreach ($question->options as $option) {
+                                        $optionCounts[$option->id] = [
+                                            'text' => $option->option_text,
+                                            'count' => 0,
+                                        ];
+                                    }
+                                    foreach ($question->answers as $answer) {
+                                        foreach ($answer->answerOptions as $ao) {
+                                            if (isset($optionCounts[$ao->option_id])) {
+                                                $optionCounts[$ao->option_id]['count']++;
+                                            }
                                         }
                                     }
-                                }
-                            @endphp
-                            <div class="space-y-3">
-                                @foreach($optionCounts as $opt)
-                                    @php
-                                        $pct = $totalAnswers > 0 ? round(($opt['count'] / $totalAnswers) * 100) : 0;
-                                    @endphp
-                                    <div>
-                                        <div class="flex items-center justify-between text-sm mb-1">
-                                            <span class="text-gray-700">{{ $opt['text'] }}</span>
-                                            <span class="text-gray-400">{{ $opt['count'] }} ({{ $pct }}%)</span>
-                                        </div>
-                                        <div class="w-full bg-gray-100 rounded-full h-3">
-                                            <div class="h-3 rounded-full" style="width: {{ $pct }}%; background-color: #004179;"></div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @elseif($question->question_type === 'scale')
-                            @php
-                                $scaleCounts = array_fill(1, 10, 0);
-                                $totalAnswers = $question->answers->count();
-                                foreach ($question->answers as $answer) {
-                                    $val = (int) $answer->answer_text;
-                                    if ($val >= 1 && $val <= 10) {
-                                        $scaleCounts[$val]++;
-                                    }
-                                }
-                            @endphp
-                            <div class="flex items-end gap-1 h-24">
-                                @for($i = 1; $i <= 10; $i++)
-                                    @php
-                                        $pct = $totalAnswers > 0 ? round(($scaleCounts[$i] / $totalAnswers) * 100) : 0;
-                                        $height = max($pct, 4);
-                                    @endphp
-                                    <div class="flex-1 flex flex-col items-center gap-1">
-                                        <span class="text-xs text-gray-400">{{ $scaleCounts[$i] }}</span>
-                                        <div class="w-full rounded-t" style="height: {{ $height }}%; background-color: #004179;"></div>
-                                        <span class="text-xs text-gray-500">{{ $i }}</span>
-                                    </div>
-                                @endfor
-                            </div>
-                        @else
-                            @php
-                                $totalAnswers = $question->answers->count();
-                                $textCounts = [];
-                                foreach ($question->answers as $answer) {
-                                    $text = $answer->answer_text ?: '—';
-                                    $key = strtolower(trim($text));
-                                    if (!isset($textCounts[$key])) {
-                                        $textCounts[$key] = ['text' => $text, 'count' => 0];
-                                    }
-                                    $textCounts[$key]['count']++;
-                                }
-                                uasort($textCounts, fn($a, $b) => $b['count'] - $a['count']);
-                            @endphp
-                            <div class="space-y-2 max-h-60 overflow-y-auto">
-                                @foreach($textCounts as $item)
-                                    <div class="bg-gray-50 rounded-lg px-4 py-2 text-sm text-gray-700 flex items-center justify-between">
-                                        <span>{{ $item['text'] }}</span>
+                                @endphp
+                                <div class="space-y-3">
+                                    @foreach($optionCounts as $opt)
                                         @php
-                                            $pct = $totalAnswers > 0 ? round(($item['count'] / $totalAnswers) * 100) : 0;
+                                            $pct = $totalAnswers > 0 ? round(($opt['count'] / $totalAnswers) * 100) : 0;
                                         @endphp
-                                        <span class="text-gray-400 text-xs ml-2">{{ $item['count'] }} ({{ $pct }}%)</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                @endforeach
+                                        <div>
+                                            <div class="flex items-center justify-between text-sm mb-1">
+                                                <span class="text-gray-700">{{ $opt['text'] }}</span>
+                                                <span class="text-gray-400">{{ $opt['count'] }} ({{ $pct }}%)</span>
+                                            </div>
+                                            <div class="w-full bg-gray-100 rounded-full h-3">
+                                                <div class="h-3 rounded-full" style="width: {{ $pct }}%; background-color: #004179;"></div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @elseif($question->question_type === 'scale')
+                                @php
+                                    $scaleCounts = array_fill(1, 10, 0);
+                                    $totalAnswers = $question->answers->count();
+                                    foreach ($question->answers as $answer) {
+                                        $val = (int) $answer->answer_text;
+                                        if ($val >= 1 && $val <= 10) {
+                                            $scaleCounts[$val]++;
+                                        }
+                                    }
+                                @endphp
+                                <div class="flex items-end gap-1 h-24">
+                                    @for($i = 1; $i <= 10; $i++)
+                                        @php
+                                            $pct = $totalAnswers > 0 ? round(($scaleCounts[$i] / $totalAnswers) * 100) : 0;
+                                            $height = max($pct, 4);
+                                        @endphp
+                                        <div class="flex-1 flex flex-col items-center gap-1">
+                                            <span class="text-xs text-gray-400">{{ $scaleCounts[$i] }}</span>
+                                            <div class="w-full rounded-t" style="height: {{ $height }}%; background-color: #004179;"></div>
+                                            <span class="text-xs text-gray-500">{{ $i }}</span>
+                                        </div>
+                                    @endfor
+                                </div>
+                            @else
+                                @php
+                                    $totalAnswers = $question->answers->count();
+                                    $textCounts = [];
+                                    foreach ($question->answers as $answer) {
+                                        $text = $answer->answer_text ?: '—';
+                                        $key = strtolower(trim($text));
+                                        if (!isset($textCounts[$key])) {
+                                            $textCounts[$key] = ['text' => $text, 'count' => 0];
+                                        }
+                                        $textCounts[$key]['count']++;
+                                    }
+                                    uasort($textCounts, fn($a, $b) => $b['count'] - $a['count']);
+                                @endphp
+                                <div class="space-y-2 max-h-60 overflow-y-auto">
+                                    @foreach($textCounts as $item)
+                                        <div class="bg-gray-50 rounded-lg px-4 py-2 text-sm text-gray-700 flex items-center justify-between">
+                                            <span>{{ $item['text'] }}</span>
+                                            @php
+                                                $pct = $totalAnswers > 0 ? round(($item['count'] / $totalAnswers) * 100) : 0;
+                                            @endphp
+                                            <span class="text-gray-400 text-xs ml-2">{{ $item['count'] }} ({{ $pct }}%)</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
             @endforeach
         @endif
     </div>

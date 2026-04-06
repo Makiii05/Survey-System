@@ -44,7 +44,32 @@
 - [x] statistics
 
 - [ ] charts in each quuestion
-
 - [ ] charts can be change. Pie, Bar, Etc 
-
 - [ ] sectioning of questions
+
+
+Antonio Lina - 44
+Marife Lina - 42
+Sarah Mae Maranan - 26
+Adriane Maranan - 26
+Mary Rose Lina - 24
+Grace Ann Lina - 22
+Benito - 46
+Emmanuel - 31
+Estefanie - 17
+Joel - 34
+Joey - 38
+John - 32
+Jonalyn - 38
+Manelyn - 39
+Maria Elinor - 37 
+Maridith - 32
+Mark Romel - 24
+Mark Ryan - 22
+Maryjane - 37
+Marivhel - 41
+Nerio - 37
+Nineth - 32
+Rodel - 39
+Roger - 41
+Ronalyn - 40
