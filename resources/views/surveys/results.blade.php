@@ -28,49 +28,58 @@
                     <hr class="my-3 text-slate-400">
                     @foreach($section->questions as $question)
                         @php $questionNumber++; @endphp
+                        @php
+                            $typesWithOptions = ['radio', 'checkbox', 'dropdown'];
+                        @endphp
                         <div class="bg-white border border-gray-200 rounded-lg p-5 mb-4">
-                            <h3 class="font-medium text-gray-800 mb-4">
-                                {{ $questionNumber }}. {{ $question->question_text }}
-                                <span class="text-xs text-gray-400 ml-2">({{ ucfirst($question->question_type) }})</span>
-                            </h3>
-    
-                            @php
-                                $typesWithOptions = ['radio', 'checkbox', 'dropdown'];
-                            @endphp
-    
                             @if(in_array($question->question_type, $typesWithOptions))
                                 @php
-                                    $totalAnswers = $question->answers->count();
-                                    $optionCounts = [];
+                                    $chartData = [];
                                     foreach ($question->options as $option) {
-                                        $optionCounts[$option->id] = [
-                                            'text' => $option->option_text,
-                                            'count' => 0,
+                                        $chartData[$option->id] = [
+                                            'label' => $option->option_text,
+                                            'value' => 0,
                                         ];
                                     }
                                     foreach ($question->answers as $answer) {
-                                        foreach ($answer->answerOptions as $ao) {
-                                            if (isset($optionCounts[$ao->option_id])) {
-                                                $optionCounts[$ao->option_id]['count']++;
+                                        foreach ($answer->answerOptions as $answerOption) {
+                                            if (isset($chartData[$answerOption->option_id])) {
+                                                $chartData[$answerOption->option_id]['value']++;
                                             }
                                         }
                                     }
+                                    $chartData = array_values($chartData);
                                 @endphp
-                                <div class="space-y-3">
-                                    @foreach($optionCounts as $opt)
-                                        @php
-                                            $pct = $totalAnswers > 0 ? round(($opt['count'] / $totalAnswers) * 100) : 0;
-                                        @endphp
-                                        <div>
-                                            <div class="flex items-center justify-between text-sm mb-1">
-                                                <span class="text-gray-700">{{ $opt['text'] }}</span>
-                                                <span class="text-gray-400">{{ $opt['count'] }} ({{ $pct }}%)</span>
-                                            </div>
-                                            <div class="w-full bg-gray-100 rounded-full h-3">
-                                                <div class="h-3 rounded-full" style="width: {{ $pct }}%; background-color: #004179;"></div>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                <div data-survey-chart data-chart-data='@json($chartData)' data-chart-default="bar">
+                            @endif
+                            <h3 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                                <span class="flex-1">
+                                    {{ $questionNumber }}. {{ $question->question_text }}
+                                    <span class="text-xs text-gray-400 ml-2">({{ ucfirst($question->question_type) }})</span>
+                                </span>
+                                @if (in_array($question->question_type, $typesWithOptions))
+                                <button type="button" data-chart-type="bar" onclick="window.toggleSurveyChart(this, 'bar')" aria-pressed="true" title="Bar chart" class="p-1.5 rounded transition-colors flex items-center justify-center" style="background-color: #004179; color: #ffffff; cursor: pointer;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h10"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h16"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18h7"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4v16"/>
+                                    </svg>
+                                </button>
+                                <button type="button" data-chart-type="pie" onclick="window.toggleSurveyChart(this, 'pie')" aria-pressed="false" title="Pie chart" class="p-1.5 rounded transition-colors flex items-center justify-center" style="background-color: #e2e8f0; color: #475569; cursor: pointer;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3a9 9 0 100 18 9 9 0 000-18z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3v9h9"/>
+                                    </svg>
+                                </button>
+                                @endif
+                            </h3>
+    
+    
+                            @if(in_array($question->question_type, $typesWithOptions))
+                                <div class="mt-4 space-y-4">
+                                    <div id="chart-question-{{ $question->id }}" class="min-h-80 rounded-xl border border-gray-100 bg-gray-50/70 p-2" data-chart-container></div>
+                                </div>
                                 </div>
                             @elseif($question->question_type === 'scale')
                                 @php

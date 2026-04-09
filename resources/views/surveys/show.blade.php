@@ -132,10 +132,7 @@
                                             <label class="cursor-pointer">
                                                 <input type="radio" name="answers[{{ $question->id }}]" value="{{ $i }}"
                                                     class="hidden peer" {{ $question->is_required ? 'required' : '' }}>
-                                                <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 text-sm font-medium text-gray-600 peer-checked:text-white peer-checked:border-transparent transition"
-                                                    style="peer-checked:background-color: #004179;"
-                                                    onmouseenter="this.style.backgroundColor='#004179'; this.style.color='white';"
-                                                    onmouseleave="if(!this.previousElementSibling.checked){this.style.backgroundColor=''; this.style.color='';}">
+                                                <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 text-sm font-medium text-gray-600 peer-checked:bg-blue-900 peer-checked:text-white peer-checked:border-transparent transition">
                                                     {{ $i }}
                                                 </span>
                                             </label>
